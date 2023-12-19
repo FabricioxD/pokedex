@@ -28,6 +28,11 @@ jobs:
     - name: Build Release APK
       run: ./gradlew assembleRelease
 
+    - name: Debug APK location
+      run: |
+        ls -R app/build/outputs/apk/release/
+
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
