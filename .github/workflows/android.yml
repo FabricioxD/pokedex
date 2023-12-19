@@ -23,7 +23,7 @@ jobs:
         java-version: '11'
 
     - name: Build and Test
-        run: ./gradlew check
+      run: ./gradlew check
 
     - name: Build Release APK
       run: ./gradlew assembleRelease
