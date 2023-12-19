@@ -10,44 +10,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-    - name: Set execute permissions for gradlew
-      run: chmod +x ./gradlew
+      - name: Set execute permissions for gradlew
+        run: chmod +x ./gradlew
 
-    - name: Set up JDK
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'adopt'
-        java-version: '11'
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
 
-    - name: Build and Test
-      run: ./gradlew check
+      - name: Build and Test
+        run: ./gradlew check
 
-    - name: Build Release APK
-      run: ./gradlew assembleRelease
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
 
-    - name: Debug APK location
-      run: |
-        ls -R app/build/outputs/apk/release/
-
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-release
+          path: app/build/outputs/apk/release/
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-    - name: Display Contents of Build Directory
-      run: ls -R app/build
+      - name: Download APK artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: app-release
+          path: app/build/outputs/apk/release/
 
-    - name: Display Contents of APK Directory
-      run: ls -R app/build/outputs/apk/release
+      - name: Display Contents of APK Directory
+        run: ls -R app/build/outputs/apk/release
 
-    - name: Deploy to Firebase App Distribution
-      uses: wzieba/Firebase-Distribution-Github-Action@v1
-      with:
-        appId: ${{ secrets.FIREBASE_APP_ID }}
-        serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
-        groups: 'main-group'
-        file: 'app/build/outputs/apk/release/app-release-unsigned.apk'
+      - name: Deploy to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
+          groups: 'main-group'
+          file: 'app/build/outputs/apk/release/app-release-unsigned.apk'
