@@ -22,20 +22,22 @@ jobs:
         distribution: 'adopt'
         java-version: '11'
 
-    - name: Build and Test
-      run: ./gradlew check
-
     - name: Build Release APK
       run: ./gradlew assembleRelease
+
+  test:
+    - name: Build and Test
+      run: ./gradlew check
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-    - name: Deploy Release APK
-      uses: actions/upload-artifact@v2
+    - name: Deploy to Firebase App Distribution
+      uses: w9jds/firebase-action@v2
       with:
-        name: app-release
-        path: app/build/outputs/apk/release/app-release.apk
-
+        appId: ${{ secrets.FIREBASE_APP_ID }}
+        token: ${{ secrets.FIREBASE_TOKEN }}
+        groups: 'main-group'
+        file: 'app/build/outputs/apk/release/app-release.apk'
