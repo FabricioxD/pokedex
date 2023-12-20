@@ -22,9 +22,6 @@ jobs:
           distribution: 'adopt'
           java-version: '11'
 
-      - name: Decrypt Keystore File
-        run: gpg --decrypt --batch --passphrase ${{ secrets.GPG_PASSPHRASE }} --output pokedex_keystore.jks pokedex_keystore.jks.gpg
-
       - name: Build and Test
         run: ./gradlew check
 
@@ -50,6 +47,9 @@ jobs:
 
       - name: Display Contents of APK Directory
         run: ls -R app/build/outputs/apk/release
+
+      - name: Decrypt Keystore
+        run: echo "${{ secrets.CREDENTIAL_FILE_CONTENT }}" | base64 --decode | gpg --quiet --batch --yes --decrypt --
 
       - name: Deploy to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
