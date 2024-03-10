@@ -25,42 +25,48 @@ jobs:
       - name: Build and Test
         run: ./gradlew check
 
-      - name: Build Release APK
-        run: ./gradlew assembleRelease
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: app-release
-          path: app/build/outputs/apk/release/
-
-  deploy:
+  # Sign the release APK
+  sign-release:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download APK artifact
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Decode keystore from base64
+        run: echo ${{ secrets.KEYSTORE_BASE64 }} | base64 --decode > keystore.jks
+
+      - name: Sign app APK
+        uses: Tlaster/android-sign@v1
+        with:
+          releaseDirectory: |
+            app/build/outputs/apk/release
+            app/build/outputs/bundle/release  # Include bundle directory if needed
+          output: build/release/signed  # Output directory for signed APKs
+          alias: ${{ secrets.RELEASE_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: "30.0.2"  # Adjust if needed
+
+  # Deploy to Firebase (assuming a signed APK is available)
+  deploy:
+    needs: sign-release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download signed APK artifact (modify path if needed)
         uses: actions/download-artifact@v2
         with:
-          name: app-release
+          name: signed-release-apk  # Assuming your signed APK name
           path: app/build/outputs/apk/release/
 
-      - name: Display Contents of APK Directory
-        run: ls -R app/build/outputs/apk/release
-
       - name: Install Firebase CLI
-        run: |
-          sudo npm install -g firebase-tools
+        uses: google/firebase-tools@v1  # Official Firebase CLI action
 
-      - name: Authenticate with Firebase
-        run: |
-          echo ${{ secrets.CREDENTIAL_FILE_CONTENT }} > /tmp/firebase-credentials.json
-          firebase login:ci --token "${{ secrets.FIREBASE_TOKEN }}"
+      - name: Login to Firebase
+        run: echo ${{ secrets.FIREBASE_APP_ID }} | firebase login --project ${{ secrets.FIREBASE_APP_ID }}
 
       - name: Deploy to Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
-        with:
-          appId: ${{ secrets.FIREBASE_APP_ID }}
-          serviceCredentialsFile: /tmp/firebase-credentials.json
-          groups: 'main-group'
-          file: 'app/build/outputs/apk/release/app-release-unsigned.apk'
+        run: firebase appdistribution distribute 'app/build/outputs/apk/release/app-release.apk' --groups 'main-group'
