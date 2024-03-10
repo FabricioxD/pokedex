@@ -48,10 +48,15 @@ jobs:
       - name: Display Contents of APK Directory
         run: ls -R app/build/outputs/apk/release
 
+      - name: Authenticate with Firebase
+        run: |
+          echo ${{ secrets.CREDENTIAL_FILE_CONTENT }} > /tmp/firebase-credentials.json
+          firebase auth:activate-service-account --token "${{ secrets.FIREBASE_TOKEN }}" /tmp/firebase-credentials.json
+
       - name: Deploy to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.FIREBASE_APP_ID }}
-          serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
+          serviceCredentialsFile: /tmp/firebase-credentials.json
           groups: 'main-group'
           file: 'app/build/outputs/apk/release/app-release-unsigned.apk'
