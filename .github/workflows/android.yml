@@ -49,8 +49,8 @@ jobs:
         run: ls -R app/build/outputs/apk/release
 
       - name: Install Firebase CLI
-          run: |
-            sudo npm install -g firebase-tools
+        run: |
+          sudo npm install -g firebase-tools
 
       - name: Authenticate with Firebase
         run: |
