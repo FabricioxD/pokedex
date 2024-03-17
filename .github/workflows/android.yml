@@ -39,12 +39,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Initialize Git repository
+        run: git init
+
       - name: Download APK artifact
         uses: actions/download-artifact@v2
+
         with:
           name: app-release
           path: app/build/outputs/apk/release/
-
 
       - name: Deploy to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
