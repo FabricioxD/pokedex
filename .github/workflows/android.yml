@@ -42,9 +42,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Initialize Git repository
-        run: git init
-
       - name: Download APK artifact
         uses: actions/download-artifact@v2
 
@@ -57,5 +54,5 @@ jobs:
         with:
           appId: ${{secrets.FIREBASE_APP_ID}}
           serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
-          groups: Main Group
+          groups: main-group
           file: app/build/outputs/apk/release/app-release.apk
