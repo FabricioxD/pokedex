@@ -25,6 +25,9 @@ jobs:
       - name: Build and Test
         run: ./gradlew check
 
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+
   # Sign and deploy the release APK
   deploy:
     needs: build
