@@ -37,19 +37,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Decode keystore from base64
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > keystore.jks
-
-      - name: Sign APK
-        uses: android-actions/sign@v3
-        with:
-          release-directory: 'app/build/outputs/apk/release'
-          keystore-path: './keystore.jks'
-          keystore-alias: ${{ secrets.RELEASE_KEY_ALIAS }}
-          keystore-password: ${{ secrets.RELEASE_STORE_PASSWORD }}
-          key-password: ${{ secrets.RELEASE_KEY_PASSWORD }}
-          apk-path: 'app/build/outputs/apk/release/app-release.apk'
-
       - name: Deploy to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
