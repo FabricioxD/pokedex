@@ -28,19 +28,35 @@ jobs:
       - name: Build Release APK
         run: ./gradlew assembleRelease
 
-  # Sign and deploy the release APK
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-release
+          path: app/build/outputs/apk/release/
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+      - name: Download APK artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: app-release
+          path: app/build/outputs/apk/release/
+
+      - name: Display Contents of APK Directory
+        run: ls -R app/build/outputs/apk/release
+
+      - name: Authenticate with Firebase
+        run: |
+          echo ${{ secrets.FIREBASE_CREDENTIAL_FILE_CONTENT }} > /tmp/firebase-credentials.json
+          firebase auth:activate-service-account --token "${{ secrets.FIREBASE_TOKEN }}" /tmp/firebase-credentials.json
 
       - name: Deploy to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.FIREBASE_APP_ID }}
-          serviceCredentialsFile: ${{ secrets.FIREBASE_CREDENTIALS_FILE }}
+          serviceCredentialsFile: /tmp/firebase-credentials.json
           groups: 'main-group'
-          file: 'app/build/outputs/apk/release/app-release.apk'
+          file: 'app/build/outputs/apk/release/app-release-unsigned.apk'
