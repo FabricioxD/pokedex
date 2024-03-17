@@ -41,15 +41,14 @@ jobs:
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > keystore.jks
 
       - name: Sign APK
-        uses: r0adkll/sign-android-release@v1
+        uses: android-actions/sign@v3
         with:
-          releaseDirectory: 'app/build/outputs/apk/release'
-          alias: ${{ secrets.RELEASE_KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.RELEASE_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.RELEASE_KEY_PASSWORD }}
-
-      - name: List APK Directory Contents
-        run: ls -R app/build/outputs/apk/release
+          release-directory: 'app/build/outputs/apk/release'
+          keystore-path: './keystore.jks'
+          keystore-alias: ${{ secrets.RELEASE_KEY_ALIAS }}
+          keystore-password: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          key-password: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          apk-path: 'app/build/outputs/apk/release/app-release.apk'
 
       - name: Deploy to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
