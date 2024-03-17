@@ -25,8 +25,8 @@ jobs:
       - name: Build and Test
         run: ./gradlew check
 
-  # Sign the release APK
-  sign-release:
+  # Sign and deploy the release APK
+  deploy:
     needs: build
     runs-on: ubuntu-latest
 
@@ -37,36 +37,19 @@ jobs:
       - name: Decode keystore from base64
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > keystore.jks
 
-      - name: Sign app APK
-        uses: Tlaster/android-sign@v1
+      - name: Sign APK
+        uses: r0adkll/sign-android-release@v1
         with:
-          releaseDirectory: |
-            app/build/outputs/apk/release
-            app/build/outputs/bundle/release  # Include bundle directory if needed
-          output: build/release/signed  # Output directory for signed APKs
+          releaseDirectory: 'app/build/outputs/apk/release'
           alias: ${{ secrets.RELEASE_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.RELEASE_STORE_PASSWORD }}
           keyPassword: ${{ secrets.RELEASE_KEY_PASSWORD }}
-        env:
-          BUILD_TOOLS_VERSION: "30.0.2"  # Adjust if needed
-
-  # Deploy to Firebase (assuming a signed APK is available)
-  deploy:
-    needs: sign-release
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download signed APK artifact (modify path if needed)
-        uses: actions/download-artifact@v2
-        with:
-          name: signed-release-apk  # Assuming your signed APK name
-          path: app/build/outputs/apk/release/
-
-      - name: Install Firebase CLI
-        uses: google/firebase-tools@v1  # Official Firebase CLI action
-
-      - name: Login to Firebase
-        run: echo ${{ secrets.FIREBASE_APP_ID }} | firebase login --project ${{ secrets.FIREBASE_APP_ID }}
+          apkPath: 'app/build/outputs/apk/release/app-release.apk'
 
       - name: Deploy to Firebase App Distribution
-        run: firebase appdistribution distribute 'app/build/outputs/apk/release/app-release.apk' --groups 'main-group'
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          serviceCredentialsFile: ${{ secrets.FIREBASE_CREDENTIALS_FILE }}
+          groups: 'main-group'
+          file: 'app/build/outputs/apk/release/app-release.apk'
