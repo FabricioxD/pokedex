@@ -43,11 +43,13 @@ jobs:
       - name: Sign APK
         uses: r0adkll/sign-android-release@v1
         with:
-          releaseDirectory: 'app/build/outputs/apk/release/app-release.apk'
+          releaseDirectory: 'app/build/outputs/apk/release'
           alias: ${{ secrets.RELEASE_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.RELEASE_STORE_PASSWORD }}
           keyPassword: ${{ secrets.RELEASE_KEY_PASSWORD }}
-          apkPath: 'app/build/outputs/apk/release/app-release.apk'
+
+      - name: List APK Directory Contents
+        run: ls -R app/build/outputs/apk/release
 
       - name: Deploy to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
