@@ -23,7 +23,7 @@ jobs:
           java-version: '11'
 
       - name: Static Analysis
-        run: ./gradlew detekt
+        run: ./gradlew detekt ktlintCheck
 
       - name: Build and Test
         run: ./gradlew check
