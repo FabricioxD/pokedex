@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      distributeToFirebase:
+        description: "Define whether distribute to firebase or not"
+        required: false
+        default: false
 
 jobs:
   build:
@@ -52,7 +58,7 @@ jobs:
           path: app/build/outputs/apk/release/
 
       - name: Deploy to Firebase App Distribution
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.distribute == 'true' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.distributeToFirebase == 'true' }}
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{secrets.FIREBASE_APP_ID}}
