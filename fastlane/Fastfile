@@ -1,0 +1,24 @@
+# Fastfile for Android CI/CD
+
+# Define a lane for building and uploading the APK to Firebase App Distribution
+lane :build_and_upload_apk do
+  # Checkout the repository (already handled by GitHub Actions)
+
+  # Setup JDK and Ruby (already handled by GitHub Actions)
+
+  # Install required plugins
+  install_plugins
+
+  # Generate keystore and service account files (already handled by GitHub Actions)
+
+  # Build the app with Gradle
+  gradle(task: "assembleRelease")
+
+  # Upload the APK to Firebase App Distribution
+  firebase_app_distribution(
+    app: ENV["FIREBASE_APP_ID"],
+    groups: "testers",  # Replace with your desired distribution group
+    release_notes: "New build from Fastlane",
+    apk_path: "app/build/outputs/apk/release/app-release.apk"
+  )
+end

@@ -1,67 +1,65 @@
-name: Android CI/CD
+
+name: Create and Upload Apk on Firebase App Distribution.
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
-    inputs:
-      distributeToFirebase:
-        description: "Define whether distribute to firebase or not"
-        required: false
-        default: false
+    branches: [ main ]
 
 jobs:
-  build:
+  # Job 1 ->
+  CI-Prod:
+    name: Apk uploading on Firebase App Distribution
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Set execute permissions for gradlew
-        run: chmod +x ./gradlew
-
-      - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'adopt'
-          java-version: '11'
-
-      - name: Static Analysis
-        run: ./gradlew detekt ktlintCheck
-
-      - name: Build and Test
-        run: ./gradlew check
-
-      - name: Build Release APK
-        run: ./gradlew assembleRelease
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: app-release
-          path: app/build/outputs/apk/release/
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
+    # Step 1 Store all required keys in environment variable
+    env:
+      FIREBASE_CLI_TOKEN: ${{secrets.FIREBASE_TOKEN}}
+      FIREBASE_APP_ID: ${{secrets.FIREBASE_APP_ID}}
+      ANDROID_KEY_ALIAS: ${{secrets.RELEASE_KEY_ALIAS}}
+      ANDROID_KEY_PASSWORD: ${{secrets.RELEASE_KEY_PASSWORD}}
+      ANDROID_STORE_PASSWORD: ${{secrets.RELEASE_STORE_FILE}}
+      ANDROID_SIGNING_KEY: ${{secrets.KEYSTORE_BASE64}}
+      PRIVATE_SERVICE_ACCOUNT_KEY: ${{secrets.PRIVATE_SERVICE_ACCOUNT_KEY}}
 
     steps:
-      - name: Checkout Repository
+      # Step 2 Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Download APK artifact
-        uses: actions/download-artifact@v2
+      # Step 3 Setup JDK
+      - name: Setup JDK
+        uses: actions/setup-java@v1
         with:
-          name: app-release
-          path: app/build/outputs/apk/release/
+          java-version: 11
 
-      - name: Deploy to Firebase App Distribution
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.distributeToFirebase == 'true' }}
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
+      # Step 4 Setup Ruby
+      - name: Setup Ruby
+        uses: actions/setup-ruby@v1
         with:
-          appId: ${{secrets.FIREBASE_APP_ID}}
-          serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
-          groups: main-group
-          file: app/build/outputs/apk/release/app-release.apk
+          ruby-version: '2.6'
+
+      # Step 5 Install the bundler & Fastlane (Create environment for ruby to avoid dependency hell and manage the dependencies versions)
+      - name: Install bundler
+        run: |
+          gem install bundler:2.2.27
+          bundle config path vendor/bundle
+          bundle install --jobs 4 --retry 3
+      # Step 6 Install the Firebase app distribution plugin with fastlane
+      - name: Install Firebase app distribution plugin
+        run: bundle exec fastlane add_plugin firebase_app_distribution
+
+      # Step 7 Run the Base64 command to decode our PRIVATE_SERVICE_ACCOUNT_KEY and create the private-decoded-key.json file of our service account
+      - name: Generate google-services.json file
+        run: echo ${{secrets.PRIVATE_SERVICE_ACCOUNT_KEY}} | base64 -d > /home/runner/work/pokedex/My Application/google-services.json
+
+      # Step 8 Run the fastlane command to update versionCode and versionName based on latest build uploaded on firebase
+      - name: Upgrade build version
+        run: bundle exec fastlane getLatestVersionAndUpgrade
+
+      # Step 9 Run the Base64 command to decode and create the .jks file from base64 string of .jks
+      - name: Generate .jks file
+        run: echo ${{secrets.ANDROID_SIGNING_KEY}} | base64 -d > /home/runner/work/pokedex/My Application/pokedex_keystore.jks
+
+      # Step 10 Run the fastlane command to upload the build
+      - name: Upload Apk to Firebase
+        run: bundle exec fastlane build_and_upload_apk
