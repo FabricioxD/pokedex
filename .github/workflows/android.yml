@@ -34,7 +34,7 @@ jobs:
 
       # Step 4 Setup Ruby
       - name: Setup Ruby
-        uses: actions/setup-ruby@v3
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: '2.6'
 
