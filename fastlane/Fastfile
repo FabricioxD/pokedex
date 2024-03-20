@@ -16,8 +16,6 @@ lane :build_and_upload_apk do
   # Upload the APK to Firebase App Distribution
   firebase_app_distribution(
     app: ENV["FIREBASE_APP_ID"],
-    groups: "testers",  # Substitua pelo seu grupo de distribuição desejado
-    release_notes: "Nova compilação do Fastlane",
-    apk_path: "app/build/outputs/apk/release/app-release.apk"
+    groups: "main-group",  # Substitua pelo seu grupo de distribuição desejado
   )
 end
