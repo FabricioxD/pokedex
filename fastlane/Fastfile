@@ -4,12 +4,14 @@
 
 # Define a lane for building and uploading the APK to Firebase App Distribution
 lane :build_and_upload_apk do
-  # Checkout the repository (already handled by GitHub Actions)
+  # Checkout the repository (já tratado pelas Actions do GitHub)
 
-  # Setup JDK and Ruby (already handled by GitHub Actions)
+  # Setup JDK and Ruby (já tratado pelas Actions do GitHub)
 
+  # Generate keystore and service account files (já tratado pelas Actions do GitHub)
 
-  # Generate keystore and service account files (already handled by GitHub Actions)
+  # Conceder permissão de execução ao gradlew
+  sh("chmod +x gradlew")
 
   # Build the app with Gradle
   gradle(task: "assembleRelease")
@@ -17,8 +19,8 @@ lane :build_and_upload_apk do
   # Upload the APK to Firebase App Distribution
   firebase_app_distribution(
     app: ENV["FIREBASE_APP_ID"],
-    groups: "testers",  # Replace with your desired distribution group
-    release_notes: "New build from Fastlane",
+    groups: "testers",  # Substitua pelo seu grupo de distribuição desejado
+    release_notes: "Nova compilação do Fastlane",
     apk_path: "app/build/outputs/apk/release/app-release.apk"
   )
 end
