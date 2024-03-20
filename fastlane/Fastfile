@@ -10,9 +10,6 @@ lane :build_and_upload_apk do
 
   # Generate keystore and service account files (já tratado pelas Actions do GitHub)
 
-  # Conceder permissão de execução ao gradlew
-  sh("chmod +x gradlew")
-
   # Build the app with Gradle
   gradle(task: "assembleRelease")
 
