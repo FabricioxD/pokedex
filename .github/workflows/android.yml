@@ -62,4 +62,4 @@ jobs:
 
       # Step 10 Run the fastlane command to upload the build
       - name: Upload Apk to Firebase
-        run: bundle exec fastlane build_and_upload_apk
+        run: bundle exec fastlane build_and_upload_apk_with_auth
