@@ -52,13 +52,10 @@ jobs:
       - name: Generate google-services.json file
         run: echo ${{secrets.PRIVATE_SERVICE_ACCOUNT_KEY}} | base64 -d > /home/runner/work/_temp/google-services.json
 
-      # Step 8 Run the fastlane command to update versionCode and versionName based on latest build uploaded on firebase
-      - name: Upgrade build version
-        run: bundle exec fastlane getLatestVersionAndUpgrade
 
       # Step 9 Run the Base64 command to decode and create the .jks file from base64 string of .jks
       - name: Generate .jks file
-        run: echo ${{secrets.ANDROID_SIGNING_KEY}} | base64 -d > /home/runner/work/pokedex/My Application/pokedex_keystore.jks
+        run: echo ${{secrets.ANDROID_SIGNING_KEY}} | base64 -d > /home/runner/work/_temp/pokedex_keystore.jks
 
       # Step 10 Run the fastlane command to upload the build
       - name: Upload Apk to Firebase
