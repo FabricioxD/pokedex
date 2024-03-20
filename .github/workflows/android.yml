@@ -50,7 +50,7 @@ jobs:
 
       # Step 7 Run the Base64 command to decode our PRIVATE_SERVICE_ACCOUNT_KEY and create the private-decoded-key.json file of our service account
       - name: Generate google-services.json file
-        run: echo ${{secrets.PRIVATE_SERVICE_ACCOUNT_KEY}} | base64 -d > /home/runner/work/pokedex/My Application/google-services.json
+        run: echo ${{secrets.PRIVATE_SERVICE_ACCOUNT_KEY}} | base64 -d > /home/runner/work/pokedex/Pokedex/google-services.json
 
       # Step 8 Run the fastlane command to update versionCode and versionName based on latest build uploaded on firebase
       - name: Upgrade build version
