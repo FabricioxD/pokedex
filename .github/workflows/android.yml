@@ -12,6 +12,7 @@ jobs:
 
     # Step 1 Store all required keys in environment variable
     env:
+      FIREBASE_CREDENTIAL_FILE: ${{secrets.CREDENTIAL_FILE_CONTENT}}
       FIREBASE_CLI_TOKEN: ${{secrets.FIREBASE_TOKEN}}
       FIREBASE_APP_ID: ${{secrets.FIREBASE_APP_ID}}
       ANDROID_KEY_ALIAS: ${{secrets.RELEASE_KEY_ALIAS}}

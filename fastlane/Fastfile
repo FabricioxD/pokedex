@@ -20,6 +20,7 @@ lane :build_and_upload_apk_with_auth do
 
   # Upload the APK to Firebase App Distribution
   firebase_app_distribution(
+    service_credential_files: ENV["FIREBASE_CREDENTIAL_FILE"]
     app: ENV["FIREBASE_APP_ID"],
     groups: "main-group",  # Replace with your desired distribution group
     release_notes: "New build from Fastlane"  # Optional: Add release notes
