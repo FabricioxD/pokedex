@@ -13,11 +13,6 @@ lane :build_and_upload_apk_with_auth do
   # Build the app with Gradle
   gradle(task: "assembleRelease")
 
-  # Login to Firebase App Distribution (using secret)
-  firebase_app_distribution_login(
-    refresh_token: ENV["FIREBASE_CLI_TOKEN"]
-  )
-
   # Upload the APK to Firebase App Distribution
   firebase_app_distribution(
     service_credential_files: ENV["FIREBASE_CREDENTIAL_FILE"],
