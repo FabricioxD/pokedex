@@ -4,16 +4,22 @@
 
 # Define a lane for building and uploading the APK to Firebase App Distribution
 lane :build_and_upload_apk_with_auth do
-  # Load the base64-encoded credential JSON from GitHub secrets
-  base64_credential = ENV['FIREBASE_CREDENTIAL_FILE']
+   # Get the base64-encoded secret from the environment variable
+    key_base64 = ENV['FIREBASE_CREDENTIAL_FILE']
 
-  # Decode the base64-encoded string to a JSON file
-  File.open('firebase-credentials.json', 'wb') do |file|
-    file.write(Base64.decode64(base64_credential))
-  end
+    # Decode the base64-encoded string
+    key_decoded = `echo #{key_base64} | base64 -d`.strip
 
-  # Set the path to the decoded JSON file as an environment variable
-  ENV['FIREBASE_CREDENTIAL_FILE'] = './firebase-credentials.json'
+    # Set the path to save the decoded JSON file
+    decoded_file_path = '/home/runner/work/_temp/google-services.json'
+
+    # Write the decoded JSON to the specified file path
+    File.open(decoded_file_path, 'wb') do |file|
+      file.write(key_decoded)
+    end
+
+    # Set the path to the decoded JSON file as an environment variable
+    ENV['FIREBASE_CREDENTIAL_FILE'] = decoded_file_path
 
   # Build the app with Gradle
   gradle(task: "assembleRelease")
