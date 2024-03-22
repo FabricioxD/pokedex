@@ -63,5 +63,10 @@ jobs:
         run: echo ${{secrets.ANDROID_SIGNING_KEY}} | base64 -d > /home/runner/work/_temp/pokedex_keystore.jks
 
       # Step 10 Run the fastlane command to upload the build
-      - name: Upload Apk to Firebase
-        run: bundle exec fastlane build_and_upload_apk_with_auth
+      - name: Deploy to Firebase
+        run: fastlane build_and_upload_apk_with_auth
+        env:
+          FIREBASE_CREDENTIALS: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+

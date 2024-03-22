@@ -4,14 +4,12 @@
 
 # Define a lane for building and uploading the APK to Firebase App Distribution
 lane :build_and_upload_apk_with_auth do
-   # Obtenha o valor do segredo FIREBASE_CREDENTIALS_BASE64
-   base64_credential = ENV['FIREBASE_CREDENTIAL_FILE']
+    # Install Firebase CLI
+      sh "sudo npm install -g firebase-tools"
 
-     # Decodifique a string base64 para o arquivo JSON
-   decoded_file_path = '/home/runner/work/_temp/firebase_credential_file.json'
-   File.open(decoded_file_path, 'wb') do |file|
-      file.write(Base64.decode64(base64_credential))
-   end
+      # Authenticate with Firebase
+      sh "echo $FIREBASE_CREDENTIALS > /home/runner/work/_temp/firebase-credentials.json"
+      sh "firebase login:ci --token $FIREBASE_TOKEN"
 
   # Build the app with Gradle
   gradle(task: "assembleRelease")
@@ -19,9 +17,7 @@ lane :build_and_upload_apk_with_auth do
   # Upload the APK to Firebase App Distribution
   firebase_app_distribution(
     app: ENV["FIREBASE_APP_ID"],
-    firebase_cli_token: ENV["FIREBASE_CLI_TOKEN"],
     apk_path: ENV["APK_PATH"],
-    service_credentials_file: decoded_file_path,
     groups: "main-group",  # Replace with your desired distribution group
     release_notes: "New build from Fastlane"  # Optional: Add release notes
   )
