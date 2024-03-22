@@ -4,22 +4,14 @@
 
 # Define a lane for building and uploading the APK to Firebase App Distribution
 lane :build_and_upload_apk_with_auth do
-   # Get the base64-encoded secret from the environment variable
-    key_base64 = ENV['FIREBASE_CREDENTIAL_FILE']
+   # Obtenha o valor do segredo FIREBASE_CREDENTIALS_BASE64
+   base64_credential = ENV['FIREBASE_CREDENTIAL_FILE']
 
-    # Decode the base64-encoded string
-    key_decoded = `echo #{key_base64} | base64 -d`.strip
-
-    # Set the path to save the decoded JSON file
-    decoded_file_path = '/home/runner/work/_temp/firebase_credential_file.json'
-
-    # Write the decoded JSON to the specified file path
-    File.open(decoded_file_path, 'wb') do |file|
-      file.write(key_decoded)
-    end
-
-    # Set the path to the decoded JSON file as an environment variable
-    ENV['FIREBASE_CREDENTIAL_FILE'] = decoded_file_path
+     # Decodifique a string base64 para o arquivo JSON
+   decoded_file_path = '/home/runner/work/_temp/firebase_credential_file.json'
+   File.open(decoded_file_path, 'wb') do |file|
+      file.write(Base64.decode64(base64_credential))
+   end
 
   # Build the app with Gradle
   gradle(task: "assembleRelease")
@@ -29,7 +21,7 @@ lane :build_and_upload_apk_with_auth do
     app: ENV["FIREBASE_APP_ID"],
     firebase_cli_token: ENV["FIREBASE_CLI_TOKEN"],
     apk_path: ENV["APK_PATH"],
-    service_credentials_file: ENV["FIREBASE_CREDENTIAL_FILE"],
+    service_credentials_file: decoded_file_path,
     groups: "main-group",  # Replace with your desired distribution group
     release_notes: "New build from Fastlane"  # Optional: Add release notes
   )
