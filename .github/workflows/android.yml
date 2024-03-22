@@ -20,6 +20,7 @@ jobs:
       ANDROID_STORE_PASSWORD: ${{secrets.RELEASE_STORE_FILE}}
       ANDROID_SIGNING_KEY: ${{secrets.KEYSTORE_BASE64}}
       PRIVATE_SERVICE_ACCOUNT_KEY: ${{secrets.PRIVATE_SERVICE_ACCOUNT_KEY}}
+      APK_PATH: "app/build/outputs/apk/release/app-release.apk"
 
     steps:
       # Step 2 Checkout Repository
