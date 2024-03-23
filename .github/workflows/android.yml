@@ -50,9 +50,15 @@ jobs:
       - name: Install Firebase app distribution plugin
         run: bundle exec fastlane add_plugin firebase_app_distribution
 
+      - name: Install Firebase app distribution plugin
+        run: bundle exec fastlane add_plugin firebase_app_distribution
+
       # Step 7 Run the Base64 command to decode our PRIVATE_SERVICE_ACCOUNT_KEY and create the private-decoded-key.json file of our service account
       - name: Generate google-services.json file
         run: echo ${{secrets.PRIVATE_SERVICE_ACCOUNT_KEY}} | base64 -d > /home/runner/work/_temp/google-services.json
+
+      - name: Generate firebase_credential.json file
+        run: echo ${{secrets.CREDENTIAL_FILE_CONTENT}} | base64 -d > /home/runner/work/_temp/firebase_credential.json
 
       # Step 8 Grant execute permission to gradlew
       - name: Grant execute permission to gradlew
@@ -69,4 +75,3 @@ jobs:
           FIREBASE_CREDENTIALS: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
-
