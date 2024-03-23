@@ -58,7 +58,7 @@ jobs:
         run: echo ${{secrets.PRIVATE_SERVICE_ACCOUNT_KEY}} | base64 -d > /home/runner/work/_temp/google-services.json
 
       - name: Generate firebase_credential.json file
-        run: echo ${{secrets.CREDENTIAL_FILE_CONTENT}} | base64 -d > /home/runner/work/_temp/firebase_credential.json
+        run: echo ${{ secrets.CREDENTIAL_FILE_CONTENT }} | base64 -d > /home/runner/work/_temp/firebase_credential.json
 
       # Step 8 Grant execute permission to gradlew
       - name: Grant execute permission to gradlew
