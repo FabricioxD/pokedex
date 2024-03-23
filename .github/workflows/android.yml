@@ -1,8 +1,8 @@
-name: Create and Upload Apk on Firebase App Distribution.
+name: Create and Upload Apk on Firebase App Distribution
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   # Job 1 ->
@@ -50,28 +50,26 @@ jobs:
       - name: Install Firebase app distribution plugin
         run: bundle exec fastlane add_plugin firebase_app_distribution
 
-      - name: Install Firebase app distribution plugin
-        run: bundle exec fastlane add_plugin firebase_app_distribution
-
       # Step 7 Run the Base64 command to decode our PRIVATE_SERVICE_ACCOUNT_KEY and create the private-decoded-key.json file of our service account
       - name: Generate google-services.json file
         run: echo ${{secrets.PRIVATE_SERVICE_ACCOUNT_KEY}} | base64 -d > /home/runner/work/_temp/google-services.json
 
+      # Step 8 Generate firebase_credential.json file
       - name: Generate firebase_credential.json file
-        run: echo ${{secrets.CREDENTIAL_FILE_CONTENT}} | base64 -d > /home/runner/work/_temp/firebase_credential.json
+        run: echo "${{secrets.CREDENTIAL_FILE_CONTENT}}" | base64 -d > /home/runner/work/_temp/firebase_credential.json
 
-      # Step 8 Grant execute permission to gradlew
+      # Step 9 Grant execute permission to gradlew
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
 
-      # Step 9 Run the Base64 command to decode and create the .jks file from base64 string of .jks
+      # Step 10 Run the Base64 command to decode and create the .jks file from base64 string of .jks
       - name: Generate .jks file
         run: echo ${{secrets.ANDROID_SIGNING_KEY}} | base64 -d > /home/runner/work/_temp/pokedex_keystore.jks
 
-      # Step 10 Run the fastlane command to upload the build
+      # Step 11 Run the fastlane command to upload the build
       - name: Deploy to Firebase
         run: fastlane build_and_upload_apk_with_auth
         env:
-          FIREBASE_CREDENTIALS: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_CREDENTIALS: ${{secrets.CREDENTIAL_FILE_CONTENT}}
+          FIREBASE_TOKEN: ${{secrets.FIREBASE_TOKEN}}
+          FIREBASE_APP_ID: ${{secrets.FIREBASE_APP_ID}}
