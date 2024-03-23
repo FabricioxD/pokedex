@@ -56,7 +56,9 @@ jobs:
 
       # Step 8 Generate firebase_credential.json file
       - name: Generate firebase_credential.json file
-        run: echo ${{secrets.CREDENTIAL_FILE_CONTENT}} | base64 -d > /home/runner/work/_temp/firebase_credential.json
+        run: |
+          echo ${{secrets.CREDENTIAL_FILE_CONTENT}} > firebase_credentials.json.b64
+          base64 -d -i firebase_credentials.json.b64 > /home/runner/work/_temp/firebase_credentials.json
 
       # Step 9 Grant execute permission to gradlew
       - name: Grant execute permission to gradlew
