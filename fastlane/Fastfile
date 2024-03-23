@@ -5,11 +5,11 @@
 # Define a lane for building and uploading the APK to Firebase App Distribution
 lane :build_and_upload_apk_with_auth do
     # Install Firebase CLI
-      sh "sudo npm install -g firebase-tools"
+  sh "npm install -g firebase-tools"
 
       # Authenticate with Firebase
-      sh "echo $FIREBASE_CREDENTIALS > /home/runner/work/_temp/firebase-credentials.json"
-      sh "firebase login:ci --no-localhost --token $FIREBASE_TOKEN"
+  sh "echo $FIREBASE_CREDENTIALS > /home/runner/work/_temp/firebase-credentials.json"
+  sh "firebase login:ci --no-localhost --token $FIREBASE_TOKEN"
 
   # Build the app with Gradle
   gradle(task: "assembleRelease")
