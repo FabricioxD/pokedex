@@ -13,7 +13,7 @@ lane :build_and_upload_apk_with_auth do
     app: ENV["FIREBASE_APP_ID"],
     apk_path: ENV["APK_PATH"],
     firebase_cli_path: ENV["FIREBASE_CLI_TOKEN"],
-    service_credentials_file: ENV["FIREBASE_CREDENTIAL_FILE"],
+    service_credentials_file: "/home/runner/work/_temp/credential.json",
     groups: "main-group",  # Replace with your desired distribution group
     release_notes: "New build from Fastlane"  # Optional: Add release notes
   )
